@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
-from .models import Post
-from .forms import PostForm
+from .models import Post, Cv
+from .forms import PostForm, CvForm
 
 # Create your views here.
 def post_list(request):
@@ -22,7 +22,7 @@ def post_new(request):
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = request.user
-                #post.published_date = timezone.now()
+                #post.published_date = timezone.now() #disabled as publishing is now done separately
                 post.save()
                 return redirect('post_detail', pk=post.pk)
         else:
@@ -65,3 +65,27 @@ def post_remove(request, pk):
     post = get_object_or_404(Post, pk=pk)
     post.delete()
     return redirect('post_list')
+
+def cv_view(request):
+    cv = get_object_or_404(Cv)
+    return render(request, 'blog/cv_view.html', {'cv': cv})
+
+@login_required
+def cv_update(request):
+    if request.user.is_authenticated:
+        cv = get_object_or_404(Cv)
+        if request.method == "POST":
+            form = CvForm(request.POST, instance=cv)
+            if form.is_valid():
+                cv = form.save(commit=False)
+                cv.owner = request.user
+                cv.last_updated = timezone.now()
+                cv.save()
+                return redirect('cv_view')
+        else:
+            form = CvForm(instance=cv)
+        return render(request, 'blog/cv_update.html', {'cv': cv})
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+    
+    
