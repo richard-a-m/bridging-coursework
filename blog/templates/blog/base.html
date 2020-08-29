@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 {% load static %}
 <html>
     <head>
@@ -6,21 +7,21 @@
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
         <link href='//fonts.googleapis.com/css?family=Bungee+Inline|Roboto' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="{% static 'css/blog.css' %}">
-        <script src="{% static 'js/tinymce/tinymce.min.js' %}"></script>
-        <script type="text/javascript" src="{% static 'js/tinymce/custom.js' %}" ></script>
+        {{ form.media }}
     </head>
     <body>
         <div class="page-header">
-            <!-- TODO add cv link here-->
             {% if user.is_authenticated %}
                 <a href="{% url 'post_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
                 <a href="{% url 'post_draft_list' %}" class="top-menu"><span class="glyphicon glyphicon-edit"></span></a>
                 <p class="top-menu">Hello {{ user.username }} <small>(<a href="{% url 'logout' %}">Log out</a>)</small></p>
             {% else %}
-                <a href="{% url 'login' %}" class="top-menu"><span class="glyphicon glyphicon-lock"></span></a>
+                <a href="{% url 'login' %}" class="top-menu" id="login-link"><span class="glyphicon glyphicon-lock"></span></a>
             {% endif %}
+            <button type="button" class = "top-menu"><a href = "{% url 'cv_view' %}">CV</a></button>
             <h1><a href="/">Richard's Website</a></h1>
         </div>
+        <div class = "background-bar"></div>
         <div class="content container">
             <div class="row">
                 <div class="col-md-8">

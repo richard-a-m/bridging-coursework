@@ -2,12 +2,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
-from .models import Post, Cv
-from .forms import PostForm, CvForm
+from .models import Post#, Cv
+from .forms import PostForm#, CvForm
 
 # Create your views here.
 def post_list(request):
-    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
+    #TODO remove cv post?
     return render(request, 'blog/post_list.html', {'posts': posts})
 
 def post_detail(request, pk):
@@ -67,6 +68,9 @@ def post_remove(request, pk):
     return redirect('post_list')
 
 def cv_view(request):
+    return post_detail(request, 1) #TODO better way to do this?
+
+"""def cv_view(request):
     cv = get_object_or_404(Cv)
     return render(request, 'blog/cv_view.html', {'cv': cv})
 
@@ -86,6 +90,6 @@ def cv_update(request):
             form = CvForm(instance=cv)
         return render(request, 'blog/cv_update.html', {'cv': cv})
     else:
-        return HttpResponseNotFound('<h1>Page not found</h1>')
+        return HttpResponseNotFound('<h1>Page not found</h1>')"""
     
     

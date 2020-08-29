@@ -4,7 +4,7 @@ h1 a, h2 a {
 }
 
 body {
-    padding-left: 15px;
+/*    padding-left: 15px;*/
 }
 
 .page-header {
@@ -19,8 +19,37 @@ body {
     text-decoration: none;
 }
 
+.page-header h2, .page-header h2 a, .page-header h2 a:visited, .page-header h2 a:active {
+    color: #ffffff;
+    font-size: 26pt;
+    text-decoration: none;
+}
+
 .content {
-    margin-left: 40px;
+    margin: auto;
+    width: 60%;
+}
+
+.content p{
+    width: 57vw; /* bootstrap css override, better way to do this?*/
+}
+
+/* TODO make better suited for small vw*/
+.row {
+    margin-left:0.1vw;
+    padding: 0px;
+}
+
+.background-bar {
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    position: fixed;
+    height: 100vh;
+    width: 60%;
+    background-color:rgba(194, 81, 0, 0.3);
+    z-index:-1;
 }
 
 h1, h2, h3, h4 {
@@ -46,22 +75,13 @@ h1, h2, h3, h4 {
     margin-right: 20px;
 }
 
+.topmenu button {
+    /*TODO*/
+}
 .post {
-    margin-bottom: 70px;
+    margin-bottom: 40px;
 }
 
 .post h2 a, .post h2 a:visited {
     color: #000000;
-}
-
-.cv {
-    margin-bottom: 70px;
-}
-
-.cv h2 a, .cv h2 a:visited {
-    color: #000000;
-}
-
-.cv-form input{
-    width: 100%;
 }

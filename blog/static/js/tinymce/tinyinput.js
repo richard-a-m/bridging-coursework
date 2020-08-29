@@ -1,6 +1,7 @@
 
 tinymce.init({
-  selector: 'textarea#basic-example',
+  selector: '#post-input',
+  editor_deselector : "mceNoEditor",
   height: 500,
   menubar: false,
   plugins: [

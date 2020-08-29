@@ -10,6 +10,26 @@ class PostListTest(TestCase):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'post_list.html')
         
-
+    def test_login(self):
+        #TODO
+    
+    def test_logout(self):
+        #TODO
+    
+    def test_new_post(self):
+        #TODO
+    
+    def test_publish_post(self):
+        #TODO
+    
+    def test_delete_post(self):
+        #TODO
+    
+    def test_update_post(self):
+        #TODO
+    
+    def test_update_cv(self):
+        #TODO
+    
     
     
