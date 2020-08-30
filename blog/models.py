@@ -19,7 +19,3 @@ class Post(models.Model):
     def __str__(self):
         return self.title
     
-"""class Cv(models.Model):
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    content = HTMLField()
-    last_updated = models.DateTimeField(default=timezone.now)"""

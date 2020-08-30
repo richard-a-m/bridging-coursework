@@ -10,5 +10,4 @@ urlpatterns = [
     path('post/<pk>/publish/', views.post_publish, name='post_publish'),
     path('post/<pk>/remove/', views.post_remove, name='post_remove'),
     path('cv/view', views.cv_view, name='cv_view'),
-    #path('cv/update', views.cv_update, name='cv_update'),
 ]
