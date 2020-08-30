@@ -30,11 +30,11 @@ body {
     width: 60%;
 }
 
-.content p{
+.content p {
     width: 57vw; /* bootstrap css override, better way to do this?*/
 }
 
-/* TODO make better suited for small vw*/
+/* TODO make better suited for small viewport*/
 .row {
     margin-left:0.1vw;
     padding: 0px;
@@ -75,9 +75,17 @@ h1, h2, h3, h4 {
     margin-right: 20px;
 }
 
-.topmenu button {
-    /*TODO*/
+button{
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    text-decoration: none;
 }
+
+button a , buton a:hover {
+    color: #ffffff;
+    text-decoration: none!important;
+}
+
 .post {
     margin-bottom: 40px;
 }
