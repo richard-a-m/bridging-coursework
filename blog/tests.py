@@ -1,21 +1,29 @@
 from django.test import TestCase
 from django.test import Client
+from django.test import LiveServerTestCase
 from django.urls import resolve
 from django.http import HttpRequest
 from django.contrib.auth.models import User
 from django.contrib.auth import SESSION_KEY
 from django.utils import timezone
 
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.wait import WebDriverWait
+
+import pickle, time
+
+SITE_URL = "http://localhost:8000"
 TEST_USERNAME = "test_bot"
 TEST_PASS = "UJjhzh3m9J+mRV]"
 
 # Create your tests here. #TODO improve usable tests?
-class SiteTests(TestCase):
+class UnitTests(TestCase):
     fixtures = ["test_data.json"]
     
     def setUp(self): #setup for each test
         self.c = Client()
-        self.user = User.objects.create_user(TEST_USERNAME, 'test@example.com', TEST_PASS) #TODO Make sure this doesn't have to be superuser
+        self.user = User.objects.create_user(TEST_USERNAME, 'test@example.com', TEST_PASS)
         self.user.save()
     
     def test_home_html_valid(self):
@@ -128,4 +136,84 @@ class SiteTests(TestCase):
         self.assertNotIn('_auth_user_id', self.c.session)
         self.assertFalse(SESSION_KEY in self.client.session)
         
+    def test_cv_shown(self):
+        response = self.c.get("/cv/view")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "CV")
+        
+class FunctionalTests(LiveServerTestCase):
+
+    def setUp(self):  
+        self.selenium = webdriver.Firefox()
+        self.user = User.objects.create_user(TEST_USERNAME, 'test@example.com', TEST_PASS)
+        self.user.save()
+
+    def tearDown(self):  
+        self.selenium.quit()
+
+    def test_home(self):
+        #site is correct
+        self.selenium.get(self.live_server_url)
+        self.assertIn("Richard's Website", self.selenium.title)        
+        header_text = self.selenium.find_element_by_tag_name('h1').text
+        self.assertIn("Richard's Website", header_text)
+        
+        #log in & CV exists
+        self.assertTrue(len(self.selenium.find_elements_by_id("login-link")) == 1)
+        self.assertTrue(len(self.selenium.find_elements_by_link_text("CV")) == 1)
     
+    def test_login_logout(self):
+        timeout = 2
+        self.selenium.get('%s%s' % (self.live_server_url, "/accounts/login/"))
+        username_input = self.selenium.find_element_by_name("username")
+        username_input.send_keys(TEST_USERNAME)
+        password_input = self.selenium.find_element_by_name("password")
+        password_input.send_keys(TEST_PASS)
+        self.selenium.find_element_by_xpath('//input[@value="login"]').click()
+        WebDriverWait(self.selenium, timeout).until(lambda driver: driver.find_element_by_tag_name('body'))
+        xpath_str = "//*[contains(text(), '" + TEST_USERNAME + "')]"
+        self.assertTrue(len(self.selenium.find_elements_by_xpath(xpath_str)) == 1)
+        
+        #logout
+        self.selenium.find_element_by_link_text("Log out").click()
+        WebDriverWait(self.selenium, timeout).until(lambda driver: driver.find_element_by_tag_name('body'))
+        self.assertTrue(len(self.selenium.find_elements_by_id("login-link")) == 1)
+        self.assertTrue(len(self.selenium.find_elements_by_xpath(xpath_str)) == 0)
+        
+    def test_update_cv(self):
+        timeout = 2
+        
+        #login code #TODO find a way to force login?
+        self.selenium.get('%s%s' % (self.live_server_url, "/accounts/login/"))
+        username_input = self.selenium.find_element_by_name("username")
+        username_input.send_keys(TEST_USERNAME)
+        password_input = self.selenium.find_element_by_name("password")
+        password_input.send_keys(TEST_PASS)
+        self.selenium.find_element_by_xpath('//input[@value="login"]').click()
+        WebDriverWait(self.selenium, timeout).until(lambda driver: driver.find_element_by_tag_name('body'))
+        
+        #workaround as fixtures don't seem to want to work for this...
+        self.selenium.find_element_by_class_name("glyphicon-plus").click()
+        self.selenium.find_element_by_name("title").send_keys("CV")
+        self.selenium.execute_script("tinyMCE.activeEditor.setContent('%s')" % "this is a cv blah blah blah")
+        self.selenium.find_element_by_class_name("save").click()
+        
+        #test code       
+        self.selenium.find_element_by_link_text("CV").click()
+        self.selenium.find_element_by_id("edit-post").click()
+        WebDriverWait(self.selenium, timeout).until(lambda driver: driver.find_element_by_tag_name('body'))
+        test_text = "jhawd983hgkj389gvad873hdkogg3"
+        self.selenium.execute_script("tinyMCE.activeEditor.setContent('%s')" % test_text)
+        self.selenium.find_element_by_class_name("save").click()
+        WebDriverWait(self.selenium, timeout).until(lambda driver: driver.find_element_by_tag_name('body'))
+        xpath_str = "//*[contains(text(), '" + test_text + "')]"
+        self.assertTrue(len(self.selenium.find_elements_by_xpath(xpath_str)) == 1)
+       
+    """
+    def test_post_manipulation(self):
+        self.selenium.get(self.live_server_url)
+        #TODO if necessary
+    """
+        
+        
+        
