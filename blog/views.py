@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.contrib.auth.decorators import login_required
 from .models import Post
 from .forms import PostForm
@@ -13,7 +13,13 @@ def post_list(request):
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    return render(request, 'blog/post_detail.html', {'post': post})
+    if (post.published_date is None):
+        if (request.user.is_authenticated):
+            return render(request, 'blog/post_detail.html', {'post': post})
+        else:
+            raise Http404
+    else:
+        return render(request, 'blog/post_detail.html', {'post': post})
 
 @login_required
 def post_new(request):
@@ -30,7 +36,7 @@ def post_new(request):
             form = PostForm()
         return render(request, 'blog/post_edit.html', {'form': form})
     else:
-        return HttpResponseNotFound('<h1>Page not found</h1>')
+        return Http404
 
 @login_required
 def post_edit(request, pk):
@@ -41,14 +47,15 @@ def post_edit(request, pk):
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = request.user
-                post.published_date = timezone.now()
+                if (post.published_date is not None):
+                    post.published_date = timezone.now()
                 post.save()
                 return redirect('post_detail', pk=post.pk)
         else:
             form = PostForm(instance=post)
         return render(request, 'blog/post_edit.html', {'form': form})
     else:
-        return HttpResponseNotFound('<h1>Page not found</h1>')
+        return Http404
 
 @login_required
 def post_draft_list(request):
